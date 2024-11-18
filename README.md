@@ -19,3 +19,8 @@ Windows:
 ```
 .venv\Scripts\activate
 ```
+
+Make sure to install the required dependencies.
+```
+pip install -r requirements.txt
+```
