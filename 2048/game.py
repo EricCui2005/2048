@@ -117,3 +117,14 @@ class Game(tk.Frame):
             for j in range(4):
                 new_matrix[i][j] = self.matrix[j][i]
         self.matrix = new_matrix
+    
+    
+    # Add a new 2 or 4 tile randomly to an empty cell
+    
+    def add_new_tile(self):
+        row = random.randint(0, 3)
+        col = random.randint(0, 3)
+        while(self.matrix[row][col] != 0):
+            row = random.randint(0, 3)
+            col = random.randint(0, 3)
+        self.matrix[row][col] = random.choice([2, 4])
