@@ -154,4 +154,45 @@ class Game(tk.Frame):
                     )
         self.score_label.configure(text=self.score)
         self.update_idletasks()
+        
+        
+    # Arrow-Press Functions
+        
+    def left(self, event):
+        self.stack()
+        self.combine()
+        self.stack()
+        self.add_new_tile()
+        self.update_GUI()
     
+    
+    def right(self, event):
+        self.reverse()
+        self.stack()
+        self.combine()
+        self.stack()
+        self.reverse()
+        self.add_new_tile()
+        self.update_GUI()
+    
+    
+    def up(self, event):
+        self.transpose()
+        self.stack()
+        self.combine()
+        self.stack()
+        self.transpose()
+        self.add_new_tile()
+        self.update_GUI()
+    
+    
+    def down(self, event):
+        self.transpose()
+        self.reverse()
+        self.stack()
+        self.combine()
+        self.stack()
+        self.reverse()
+        self.transpose()
+        self.add_new_tile()
+        self.update_GUI()
