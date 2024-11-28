@@ -128,3 +128,24 @@ class Game(tk.Frame):
             row = random.randint(0, 3)
             col = random.randint(0, 3)
         self.matrix[row][col] = random.choice([2, 4])
+    
+    
+    # Update the GUI to match the matrix
+    
+    def update_GUI(self):
+        for i in range(4):
+            for j in range(4):
+                cell_value = self.matrix[i][j]
+                if cell_value == 0:
+                    self.cells[i][j]["frame"].configure(bg=c.EMPTY_CELL_COLOR)
+                    self.cells[i][j]["number"].configure(bg=c.EMPTY_CELL_COLOR, text="")
+                else:
+                    self.cells[i][j]["frame"].configure(bg=c.CELL_COLORS[cell_value])
+                    self.cells[i][j]["number"].configure(
+                        bg=c.CELL_COLORS[cell_value],
+                        fg=c.CELL_NUMBER_COLORS[cell_value],
+                        font=c.CELL_NUMBER_FONTS[cell_value],
+                        text=str(cell_value)
+                    )
+        self.score_label.configure(text=self.score)
+        self.update_idletasks()
