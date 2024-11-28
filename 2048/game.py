@@ -109,3 +109,11 @@ class Game(tk.Frame):
             for j in range(4):
                 new_matrix[i].append(self.matrix[i][3 - j])
         self.matrix = new_matrix
+    
+    
+    def transpose(self):
+        new_matrix = [[0] * 4 for _ in range(4)]
+        for i in range(4):
+            for j in range(4):
+                new_matrix[i][j] = self.matrix[j][i]
+        self.matrix = new_matrix
