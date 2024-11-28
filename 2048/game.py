@@ -12,6 +12,9 @@ class Game(tk.Frame):
             self, bg=c.GRID_COLOR, bd=3, width=600, height=600
         )
         self.main_grid.grid(pady=(100,0))
+        self.make_GUI()
+        
+        self.mainloop()
         
 
     def make_GUI(self):
@@ -33,3 +36,15 @@ class Game(tk.Frame):
                 row.append(cell_data)
             self.cells.append(row)
         
+        # make score header
+        score_frame = tk.Frame(self)
+        score_frame.place(relx=0.5, y=45, anchor="center")
+        tk.Label(
+            score_frame,
+            text="Score",
+            font=c.SCORE_LABEL_FONT
+        ).grid(row=0)
+        self.score_label = tk.Label(score_frame, text="0", font=c.SCORE_FONT)
+        self.score_label.grid(row=1)
+        
+Game()
