@@ -187,7 +187,7 @@ class Game(tk.Frame):
         self.add_new_tile()
         self.update_GUI()
         self.game_over()
-    
+        
     
     def down(self, event):
         self.transpose()
@@ -249,4 +249,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main() # main
