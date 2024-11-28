@@ -17,7 +17,7 @@ source .venv/bin/activate
 
 Windows:
 ```
-.venv\Scripts\activate
+.venv/Scripts/activate
 ```
 
 Make sure to install the required dependencies.
