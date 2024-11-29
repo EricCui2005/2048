@@ -6,29 +6,34 @@ import copy
 
 class MCTS:
     
-    def __init__(self, simulations: int, rollouts: int, c: int, discount: int) -> None:
+    def __init__(self, game: Game, simulations: int, rollouts: int, c: int, discount: int) -> None:
         self._move_dict = {
             'left': {'N': 0, 'Q': 0},
             'down': {'N': 0, 'Q': 0},
             'right': {'N': 0, 'Q': 0},
             'up': {'N': 0, 'Q': 0}
         }
-        self._total_visits = 0
+        self._total_visits = 1
         
+        self._game = game
         self._simulations = simulations
         self._rollouts = rollouts
         self._c = c
         self._discount = discount
     
     
-    def div(dividend: int, divisor: int) -> float:
+    """Utility Functions"""
+    
+    def div(self, dividend: int, divisor: int) -> float:
         try:
             return dividend / divisor
         except ZeroDivisionError:
-            if dividend == 0:
-                raise ValueError("0/0 is undefined")
-            return float('inf') if dividend > 0 else float('-inf')
+            
+            # Defines 0/0 as inf
+            return float('inf') if dividend >= 0 else float('-inf')
     
+    
+    """Decision Functions"""
     
     def UCB_choice(self) -> str:
         
@@ -41,16 +46,17 @@ class MCTS:
         return best[0]
     
     
-    def MCTS_move(self, game_state: Game, simulations: int, rollouts: int) -> str:
+    def MCTS_move(self) -> str:
         
         m_dict = self._move_dict
         
-        for _ in range(simulations):
+        for _ in range(self._simulations):
+            
+            # Copying game board for MCTS simulations
+            game_copy = copy.deepcopy(self._game)
             
             # Selection
-            move = self.UCB_choice(c=100)
-            
-            game_copy = copy.deepcopy(game_state)
+            move = self.UCB_choice()
             
             # Expansion
             match move:
@@ -66,7 +72,7 @@ class MCTS:
             utility_estimate = 0
             
             # Simulation with random moving policy
-            for i in range(rollouts):
+            for i in range(self._rollouts):
                 utility_estimate += (self._discount ** i) * game_copy.score
                 sim_move = random.choice(['left', 'down', 'right', 'up'])
                 match sim_move:
@@ -80,6 +86,7 @@ class MCTS:
                         game_copy.up()
             
             # Update
+            self._total_visits += 1
             m_dict[move]['N'] += 1
             N = m_dict[move]['N']
             Q = m_dict[move]['Q']
@@ -89,6 +96,10 @@ class MCTS:
         return max(self._move_dict, key=lambda move: self._move_dict[move]['Q'])
             
             
-                
-            
+
+class MCTSPlayer:
+    
+    def move(self, game: Game) -> str:
+        mcts = MCTS(game, simulations=100, rollouts=100, c=100, discount=0.9)
+        return mcts.MCTS_move()
             
