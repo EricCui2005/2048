@@ -3,7 +3,7 @@ import colors as c
 import random
 
 
-class Game(tk.Frame):
+class GUIGame(tk.Frame):
     def __init__(self):
         tk.Frame.__init__(self)
         self.grid()
@@ -260,7 +260,7 @@ class Game(tk.Frame):
 
 
 def main():
-    Game()
+    GUIGame()
 
 
 if __name__ == "__main__":
