@@ -1,5 +1,5 @@
 import random
-import colors as c
+import game.colors as c
 
 class Game():
     def __init__(self):
