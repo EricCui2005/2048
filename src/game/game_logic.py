@@ -34,13 +34,40 @@ class Game():
     
     
     def game_log(self):
-        board = ""
-        for i in range(4):
-            line = "|"
-            for j in range(4):
-                line += f"{c.ANSI_COLORS[self._matrix[i][j]]}{self._matrix[i][j]}\033[0m|"
-            board += f"{line}\n"
+        cell_width = 7  # Width of each cell
+        cell_height = 3  # Height of each cell
+        border_horizontal = "-" * (cell_width * 4 + 5)  # Top/bottom border of the board
+
+        def format_cell(value):
+            """Format the cell with a white foreground and ANSI-colored background."""
+            bg_color = c.ANSI_COLORS[value]  # Assume this is the background color code
+            value_str = f"{value}" if value != 0 else " "
+            padded_value = value_str.center(cell_width - 2)  # Center the value in the cell
+            # Return the entire cell with background color, including padding
+            return f"{bg_color} {padded_value} \033[0m"
+
+        board = border_horizontal + "\n"
+        for row in self._matrix:
+            # Create a "row block" for each row of the board
+            row_lines = [""] * cell_height
+            for value in row:
+                bg_color = c.ANSI_COLORS[value]  # Background color for the entire cell
+                formatted_cell = format_cell(value)
+                # Add formatted cell to each line of the block
+                for line_idx in range(cell_height):
+                    if line_idx == cell_height // 2:  # Center row with the number
+                        row_lines[line_idx] += f"|{formatted_cell}"
+                    else:  # Empty rows above and below the number use the same background color
+                        row_lines[line_idx] += f"|{bg_color} {' ' * (cell_width - 2)} \033[0m"
+            # Complete each row block
+            for line in row_lines:
+                board += line + "|\n"
+            board += border_horizontal + "\n"
         print(board)
+
+
+
+
                 
     
     """Matrix Manipulation Functions"""
