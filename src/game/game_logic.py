@@ -1,4 +1,5 @@
 import random
+import colors as c
 
 class Game():
     def __init__(self):
@@ -6,7 +7,7 @@ class Game():
         self._score = 0
     
     
-    # Accessors
+    """Accessors"""
     @property
     def matrix(self):
         return self._matrix
@@ -14,6 +15,8 @@ class Game():
     def score(self):
         return self._score
     
+    
+    """State Functions"""
     
     def game_init(self):
         
@@ -35,7 +38,7 @@ class Game():
         for i in range(4):
             line = "|"
             for j in range(4):
-                line += f"{self._matrix[i][j]}|"
+                line += f"{c.ANSI_COLORS[self._matrix[i][j]]}{self._matrix[i][j]}\033[0m|"
             board += f"{line}\n"
         print(board)
                 
@@ -166,9 +169,11 @@ class Game():
     
     def game_over(self):
         if any(2048 in row for row in self.matrix):
-            print("You Win!")
+            return "Win"
         elif not self.check_zeroes() and not self.horizontal_move_exists() and not self.vertical_move_exists():
-            print("You Lose!")
+            return "Lose"
+        else:
+            return False
             
             
     

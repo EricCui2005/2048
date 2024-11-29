@@ -1,4 +1,4 @@
-from game_logic import Game
+from game.game_logic import Game
 
 def main():
     game = Game()
@@ -22,6 +22,5 @@ def main():
             case '_':
                 continue
         
-
 if __name__ == "__main__":
     main()
