@@ -12,7 +12,6 @@ Make sure to activate your virtual environment before developing.
 Linux & macOS:
 ```
 source .venv/bin/activate
-
 ```
 
 Windows:
