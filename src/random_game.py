@@ -1,12 +1,14 @@
 from game.game_logic import Game
+from players.random_player import Random
 
 def main():
     game = Game()
+    player = Random()
     game.game_init()
     game.game_log()
     
     while True:
-        move = input("Move: ")
+        move = player.move()
         match move:
             case 'w':
                 game.up()
