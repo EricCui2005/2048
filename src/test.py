@@ -1,8 +1,10 @@
-from src.game.game_logic import Game
+from game.game_logic import Game
 
 def main():
-    print("Run")
-    Game()
+    
+    game = Game()
+    game.game_init()
+    game.game_log()
 
 if __name__ == "__main__":
     main()

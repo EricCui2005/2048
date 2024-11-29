@@ -3,7 +3,7 @@ import random
 class Game():
     def __init__(self):
         self._matrix = []
-        self._score
+        self._score = 0
     
     
     def game_init(self):
@@ -19,9 +19,6 @@ class Game():
             row = random.randint(0, 3)
             col = random.randint(0, 3)
         self._matrix[row][col] = 2
-        
-        # Init score
-        self._score = 0
     
     
     def game_log(self):
