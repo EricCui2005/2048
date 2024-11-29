@@ -25,11 +25,14 @@ class Game(tk.Frame):
         
 
     def make_GUI(self):
+        
         # make grid
         self.cells = []
         for i in range(4):
             row = []
             for j in range(4):
+                
+                # Rendering each cell
                 cell_frame = tk.Frame(
                     self.main_grid,
                     bg=c.EMPTY_CELL_COLOR,
@@ -56,6 +59,7 @@ class Game(tk.Frame):
         
 
     def start_game(self):
+        
         # create matrix of zeroes
         self.matrix = [[0] * 4 for _ in range(4)]
         
@@ -89,6 +93,8 @@ class Game(tk.Frame):
     
     def stack(self):
         new_matrix = [[0] * 4 for _ in range(4)]
+        
+        # Iterating over all cells and stacking them to the left
         for i in range(4):
             fill_position = 0
             for j in range(4):
@@ -106,7 +112,7 @@ class Game(tk.Frame):
                     self.matrix[i][j + 1] = 0
                     self.score += self.matrix[i][j]
     
-    
+    # Flips a matrix horizontally 
     def reverse(self):
         new_matrix = []
         for i in range(4):
@@ -115,7 +121,7 @@ class Game(tk.Frame):
                 new_matrix[i].append(self.matrix[i][3 - j])
         self.matrix = new_matrix
     
-    
+    # Swapping rows and columns
     def transpose(self):
         new_matrix = [[0] * 4 for _ in range(4)]
         for i in range(4):
@@ -124,8 +130,13 @@ class Game(tk.Frame):
         self.matrix = new_matrix
     
     
-    # Add a new 2 or 4 tile randomly to an empty cell
+    # Checkinf if there are any zeroes in the grid
+    def check_zeroes(self):
+        if any(0 in row for row in self.matrix):
+            return True
+        return False
     
+    # Add a new 2 or 4 tile randomly to an empty cell
     def add_new_tile(self):
         row = random.randint(0, 3)
         col = random.randint(0, 3)
@@ -162,7 +173,8 @@ class Game(tk.Frame):
         self.stack()
         self.combine()
         self.stack()
-        self.add_new_tile()
+        if self.check_zeroes():
+            self.add_new_tile()
         self.update_GUI()
         self.game_over()
     
@@ -173,7 +185,8 @@ class Game(tk.Frame):
         self.combine()
         self.stack()
         self.reverse()
-        self.add_new_tile()
+        if self.check_zeroes():
+            self.add_new_tile()
         self.update_GUI()
         self.game_over()
     
@@ -184,7 +197,8 @@ class Game(tk.Frame):
         self.combine()
         self.stack()
         self.transpose()
-        self.add_new_tile()
+        if self.check_zeroes():
+            self.add_new_tile()
         self.update_GUI()
         self.game_over()
         
@@ -197,7 +211,8 @@ class Game(tk.Frame):
         self.stack()
         self.reverse()
         self.transpose()
-        self.add_new_tile()
+        if self.check_zeroes():
+            self.add_new_tile()
         self.update_GUI()
         self.game_over()
     
