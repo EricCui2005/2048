@@ -16,7 +16,7 @@ class Game():
         return self._score
     
     
-    """State Functions"""
+    """State Fuctions"""
     
     def game_init(self):
         
