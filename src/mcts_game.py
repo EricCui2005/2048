@@ -3,7 +3,7 @@ from players.mcts_player import MCTSPlayer
 
 def main():
     game = Game()
-    player = MCTSPlayer()
+    player = MCTSPlayer(simulations=100, rollouts=100, c=100, discount=0.9)
     game.game_init()
     game.game_log()
     

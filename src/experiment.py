@@ -3,10 +3,9 @@ from players.mcts_player import MCTSPlayer
 from players.random_player import Random
 from players.random_corner_player import RandomCorner
  
-def trials(num_trials):
+def trials(player, num_trials):
     
     game = Game()
-    player = RandomCorner()
     res = {'Wins': 0, 'Losses': 0}
     
     for i in range(num_trials):
@@ -28,18 +27,23 @@ def trials(num_trials):
                     game.right()
                 
             if game.game_over() == 1:
-                print(f"Trial {i}: Win")
-                res['Win'] += 1
+                # print(f"Trial {i + 1}: Win")
+                res['Wins'] += 1
                 break
             if game.game_over() == -1:
-                print(f"Trial {i}: Loss")
+                # print(f"Trial {i + 1}: Loss")
                 res['Losses'] += 1
                 break
     
     return res
 
 def main():
-    print(trials(100))
+    simulations = [20, 40, 60, 80, 100]
+    rollouts = [20, 40, 60, 80, 100]
+    
+    for sim in simulations:
+        for rollout in rollouts:
+            print(f"Simulations: {sim} | Rollouts {rollout} | {trials(MCTSPlayer(simulations=sim, rollouts=rollout, c=100, discount=0.9), 100)}")
         
 if __name__ == "__main__":
     main()

@@ -99,7 +99,13 @@ class MCTS:
 
 class MCTSPlayer:
     
+    def __init__(self, simulations, rollouts, c, discount):
+        self._simulations = simulations
+        self._rollouts = rollouts
+        self._c = c
+        self._discount = discount
+    
     def move(self, game: Game) -> str:
-        mcts = MCTS(game, simulations=100, rollouts=100, c=100, discount=0.9)
+        mcts = MCTS(game, self._simulations, self._rollouts, self._c, self._discount)
         return mcts.MCTS_move()
             
