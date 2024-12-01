@@ -27,23 +27,21 @@ def trials(player, num_trials):
                     game.right()
                 
             if game.game_over() == 1:
-                # print(f"Trial {i + 1}: Win")
+                print(f"Trial {i + 1}: Win")
                 res['Wins'] += 1
                 break
             if game.game_over() == -1:
-                # print(f"Trial {i + 1}: Loss")
+                print(f"Trial {i + 1}: Loss")
                 res['Losses'] += 1
                 break
     
     return res
 
 def main():
-    simulations = [20, 40, 60, 80, 100]
-    rollouts = [20, 40, 60, 80, 100]
+    simulations = [80, 100]
     
     for sim in simulations:
-        for rollout in rollouts:
-            print(f"Simulations: {sim} | Rollouts {rollout} | {trials(MCTSPlayer(simulations=sim, rollouts=rollout, c=100, discount=0.9), 100)}")
+        print(f"Simulations: {sim} | {trials(player=MCTSPlayer(simulations=sim, rollouts=20, c=100, discount=0.9), num_trials=100)}")
         
 if __name__ == "__main__":
     main()

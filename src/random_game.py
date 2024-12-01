@@ -8,18 +8,18 @@ def main():
     game.game_log()
     
     while True:
-        move = player.move()
+        move = player.move(game)
         match move:
-            case 'w':
+            case 'up':
                 game.up()
                 game.game_log()
-            case 'a':
+            case 'left':
                 game.left()
                 game.game_log()
-            case 's':
+            case 'down':
                 game.down()
                 game.game_log()
-            case 'd':
+            case 'right':
                 game.right()
                 game.game_log()
             case '_':
