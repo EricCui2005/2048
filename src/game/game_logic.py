@@ -196,9 +196,9 @@ class Game():
     
     def game_over(self):
         if any(2048 in row for row in self.matrix):
-            return 1
+            return 1 # Win
         elif not self.check_zeroes() and not self.horizontal_move_exists() and not self.vertical_move_exists():
-            return -1
+            return -1 # loss
         else:
             return 0
             
