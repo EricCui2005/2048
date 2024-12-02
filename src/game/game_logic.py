@@ -5,6 +5,9 @@ class Game():
     def __init__(self):
         self._matrix = []
         self._score = 0
+        
+        # Reward dict for heuristic MCTS
+        self._weight_dict = [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]
     
     
     """Accessors"""
@@ -91,7 +94,7 @@ class Game():
                 if self._matrix[i][j] != 0 and self._matrix[i][j] == self._matrix[i][j + 1]:
                     self._matrix[i][j] *= 2
                     self._matrix[i][j + 1] = 0
-                    self._score += self._matrix[i][j]
+                    self._score += (self._matrix[i][j] * self._weight_dict[i][j])
     
     # Flips a matrix horizontally 
     def reverse(self):
