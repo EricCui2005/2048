@@ -9,7 +9,6 @@ def main():
     
     while True:
         
-        # Test
         move = player.move(game)
         
         match move:
