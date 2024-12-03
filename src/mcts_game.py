@@ -7,7 +7,6 @@ def main():
     game.game_init()
     game.game_log()
     
-    # Menu
     while True:
         
         move = player.move(game)
