@@ -16,6 +16,7 @@ def trials(player, num_trials):
             
             move = player.move(game)
             
+            # Hello, Annie here (wave owo)
             match move:
                 case 'up':
                     game.up()
