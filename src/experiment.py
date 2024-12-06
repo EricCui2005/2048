@@ -16,7 +16,7 @@ def trials(player, num_trials):
             
             move = player.move(game)
             
-            # UWU
+            # UWU - eric
             match move:
                 case 'up':
                     game.up()
