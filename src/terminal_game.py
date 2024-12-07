@@ -7,6 +7,7 @@ def main():
     
     while True:
         move = input("Move: ")
+
         match move:
             case 'w':
                 game.up()
@@ -26,9 +27,11 @@ def main():
         if game.game_over() == 1:
             print("You Win!")
             break
+
         if game.game_over() == -1:
             print("Game Over!")
             break
         
 if __name__ == "__main__":
+
     main()
