@@ -11,7 +11,6 @@ def main():
         
         move = player.move(game)
         
-        # test
         match move:
             case 'up':
                 game.up()
