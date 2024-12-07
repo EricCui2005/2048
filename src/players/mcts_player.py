@@ -93,8 +93,7 @@ class MCTS:
             m_dict[move]['Q'] = ((N - 1) * Q + utility_estimate) / N
         
         # Returning move with the maximum updated Q-value
-        return max(self._move_dict, key=lambda move: self._move_dict[move]['Q'])
-            
+        return max(self._move_dict, key=lambda move: self._move_dict[move]['Q'])            
             
 
 class MCTSPlayer:
