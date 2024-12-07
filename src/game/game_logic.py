@@ -1,13 +1,16 @@
 import random
 import game.colors as c
 
+NO_WEIGHT = [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]
+CORNER_HEURISTIC = [[1, 2, 3, 4], [2, 3, 4, 5], [3, 4, 5, 6], [4, 5, 6, 7]]
+
 class Game():
     def __init__(self):
         self._matrix = []
         self._score = 0
         
         # Reward dict for heuristic MCTS
-        self._weight_dict = [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]
+        self._weight_dict = [[2, 4, 6, 8], [4, 6, 8, 10], [6, 8, 10, 12], [8,10, 12, 14]]
     
     
     """Accessors"""
