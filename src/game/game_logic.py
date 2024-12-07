@@ -67,10 +67,6 @@ class Game():
                 board += line + "|\n"
             board += border_horizontal + "\n"
         print(board)
-
-
-
-
                 
     
     """Matrix Manipulation Functions"""
@@ -194,9 +190,9 @@ class Game():
                     return True
         return False
     
-    
+
     """Game Over"""
-    
+
     def game_over(self):
         if any(2048 in row for row in self.matrix):
             return 1 # Win
@@ -204,12 +200,3 @@ class Game():
             return -1 # loss
         else:
             return 0
-            
-            
-    
-    
-
-    
-    
-    
-    
