@@ -1,8 +1,26 @@
 import random
 import game.colors as c
 
-NORMAL = [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]
-CORNER_HEURISTIC = [[1, 2, 3, 4], [2, 3, 4, 5], [3, 4, 5, 6], [4, 5, 6, 7]]
+NORMAL = [[1, 1, 1, 1], 
+          [1, 1, 1, 1], 
+          [1, 1, 1, 1], 
+          [1, 1, 1, 1]]
+
+HEURISTIC_A = [[1, 2, 3, 4], 
+               [2, 3, 4, 5], 
+               [3, 4, 5, 6], 
+               [4, 5, 6, 7]]
+
+HEURISTIC_B = [[0, 1, 2, 3], 
+               [7, 6, 5, 4], 
+               [8, 9, 10, 11], 
+               [15, 14, 13, 12]]
+
+HILL = [[1, 1, 1, 1], 
+        [1, 2, 2, 1], 
+        [1, 2, 2, 1], 
+        [1, 1, 1, 1]]
+
 
 class Game():
     def __init__(self):
@@ -10,7 +28,7 @@ class Game():
         self._score = 0
         
         # Reward dict for heuristic MCTS
-        self._weight_dict = NORMAL
+        self._weight_dict = HEURISTIC_A
     
     
     """Accessors"""

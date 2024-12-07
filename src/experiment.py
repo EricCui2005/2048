@@ -40,7 +40,7 @@ def trials(player, num_trials):
 
 
 def main():
-    print(trials(player=MCTSPlayer(simulations=10, rollouts=10, c=100, discount=0.9), num_trials=100))
+    print(trials(player=MCTSPlayer(simulations=40, rollouts=100, c=100, discount=0.9), num_trials=100))
         
 
 if __name__ == "__main__":
