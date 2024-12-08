@@ -61,7 +61,7 @@ def trials(filename, player, num_trials):
 
 def main(arg):
     filepath = 'data/run' + str(arg) + '.csv'
-    print(trials(filepath, player=MCTSPlayer(simulations=100, rollouts=10, c=100, discount=0.9), num_trials=100))
+    print(trials(filepath, player=MCTSPlayer(simulations=100, rollouts=10, c=100, discount=0.9), num_trials=1000))
 
 
 if __name__ == "__main__":
