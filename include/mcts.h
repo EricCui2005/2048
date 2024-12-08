@@ -4,8 +4,7 @@
 #include "game.h"
 #include <cmath>
 #include <string>
-#include <unordered_map>
-#include <vector>
+#include <array>
 
 class MCTS {
 
@@ -15,20 +14,23 @@ public:
 
 private:
     struct MoveData {
-        int N;
-        double Q;
+        int N = 0;
+        double Q = 0.0;
     };
 
-    std::unordered_map<std::string, MoveData> _moves;
-    int _totalVisits;
-    Game* _game;
-    int _simulations;
-    int _rollouts;
-    double _c;
-    double _discount;
+    static constexpr size_t NUM_MOVES = 4;
+    static constexpr std::array<const char*, NUM_MOVES> MOVE_STRINGS = {"left", "right", "up", "down"};
+    std::array<MoveData, NUM_MOVES> _moves;
 
-    double div(double dividend, double divisor);
-    std::string choice();
+    int _totalVisits;
+    const int _simulations;
+    const int _rollouts;
+    const double _c;
+    const double _discount;
+
+    Game* _game;
+
+    int choice();
 };
 
 class MCTSPlayer {

@@ -1,49 +1,54 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "colors.h"
+#include <array>
+#include <cstdint>
 #include <vector>
 #include <string>
+#include <iostream>
+#include <iomanip>
+#include <random>
 
 class Game {
 public:
+    static constexpr size_t GRID_SIZE = 4;
+    using Grid = std::array<std::array<uint16_t, GRID_SIZE>, GRID_SIZE>;
+
     Game();
-    Game(std::vector<std::vector<int>> weights);
+    explicit Game(const Grid& weights);
 
     // Accessors
-    const std::vector<std::vector<int>>& getGrid() const;
-    int getScore() const;
+    const Grid& getGrid() const noexcept { return _grid; }
+    uint32_t getScore() const noexcept { return _score;}
 
     // State functions
-    void init();
+    void init() noexcept;
     void log() const;
 
     // Game functions
-    void left();
-    void right();
-    void up();
-    void down();
+    void left() noexcept;
+    void right() noexcept;
+    void up() noexcept;
+    void down() noexcept;
 
     // Game over check
-    int isGameOver() const;
+    int isGameOver() const noexcept;
 
 private:
-    std::vector<std::vector<int>> _grid;
-    int _score;
-    std::vector<std::vector<int>> _weightDict;
+    Grid _grid;
+    Grid _weights;
+    uint32_t _score;
 
     // Matrix manipulation functions
-    void stack();
-    void combine();
-    void reverse();
-    void transpose();
-    bool checkZeroes() const;
-    void addNewTile();
-
-    // Helper functions for moves
-    bool horizontalMoveExists() const;
-    bool verticalMoveExists() const;
-
-    void logCell(const std::string& bgColor, const std::string& value) const;
+    void stackLeft() noexcept;
+    void combineLeft() noexcept;
+    void reverse() noexcept;
+    void transpose() noexcept;
+    bool hasEmptyCell() const noexcept;
+    void addNewTile() noexcept;
+    bool canMergeHorizontal() const noexcept;
+    bool canMergeVertical() const noexcept;
 };
 
 #endif // GAME_H

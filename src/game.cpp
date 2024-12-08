@@ -1,213 +1,179 @@
 #include "game.h"
-#include "colors.h"
-#include <iostream>
-#include <iomanip>
-#include <random>
 
-Game::Game() {
-    _grid = std::vector<std::vector<int>>(4, std::vector<int>(4, 0));
+Game::Game() : _score(0) {
+    _weights.fill({1, 1, 1, 1});
+}
+
+Game::Game(const Grid& weights) : _weights(weights), _score(0) {}
+
+void Game::init() noexcept {
+    _grid.fill({0, 0, 0, 0});
     _score = 0;
-    _weightDict = {
-        {1, 1, 1, 1},
-        {1, 1, 1, 1},
-        {1, 1, 1, 1},
-        {1, 1, 1, 1}
-    };
-}
-
-Game::Game(std::vector<std::vector<int>> weights) {
-    _grid = std::vector<std::vector<int>>(4, std::vector<int>(4, 0));
-    _score = 0;
-    _weightDict = weights;
-}
-
-const std::vector<std::vector<int>>& Game::getGrid() const {
-    return _grid;
-}
-
-int Game::getScore() const {
-    return _score;
-}
-
-void Game::init() {
-    _grid = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
     addNewTile();
     addNewTile();
 }
 
 void Game::log() const {
-    const int cellWidth = 7;
-    const int cellHeight = 3;
-    const std::string borderHorizontal(cellWidth * 4 + 5, '-');
+    static constexpr int CELL_WIDTH = 7;
+    static constexpr int CELL_HEIGHT = 3;
+    static const std::string borderHorizontal(CELL_WIDTH * GRID_SIZE + 5, '-');
 
-    auto formatCell = [&](int value) -> std::string {
-        std::string bgColor = ANSI_COLORS.count(value) ? ANSI_COLORS.at(value) : ANSI_COLORS.at(0);
-        std::string valueStr = value != 0 ? std::to_string(value) : " ";
-        
-        // Center the value
-        int padding = (cellWidth - 2 - valueStr.length()) / 2;
-        std::string paddedValue = std::string(padding, ' ') + valueStr + 
-                                 std::string(cellWidth - 2 - padding - valueStr.length(), ' ');
-        
-        return bgColor + " " + paddedValue + " \033[0m";
-    };
-
-    std::string board = borderHorizontal + "\n";
-    
-    for (const auto& row : _grid) {
-        std::vector<std::string> rowLines(cellHeight);
-        
-        for (int value : row) {
-            std::string bgColor = ANSI_COLORS.count(value) ? ANSI_COLORS.at(value) : ANSI_COLORS.at(0);
-            std::string formattedCell = formatCell(value);
-            
-            for (int lineIdx = 0; lineIdx < cellHeight; ++lineIdx) {
-                if (lineIdx == cellHeight / 2) {
-                    rowLines[lineIdx] += "|" + formattedCell;
+    for(const auto& row: _grid) {
+        std::cout << borderHorizontal << '\n';
+        for(int h = 0; h < CELL_HEIGHT; ++h) {
+            for(const auto& value : row) {
+                std::string bgColor = ANSI_COLORS.count(value) ? ANSI_COLORS.at(value) : ANSI_COLORS.at(0);
+                if(h == CELL_HEIGHT / 2) {
+                    std::string numStr = value ? std::to_string(value) : " ";
+                    int padding_left = (CELL_WIDTH - 1 - numStr.length()) / 2;
+                    int padding_right = CELL_WIDTH - 1 - padding_left - numStr.length();
+                    
+                    std::cout << '|' << bgColor 
+                        << std::string(padding_left, ' ')
+                        << numStr
+                        << std::string(padding_right, ' ')
+                        << "\033[0m";
                 } else {
-                    rowLines[lineIdx] += "|" + bgColor + " " + 
-                                       std::string(cellWidth - 2, ' ') + 
-                                       " \033[0m";
+                    std::cout << '|' << bgColor
+                        << std::string(CELL_WIDTH - 1, ' ')
+                        << "\033[0m";
                 }
             }
+            std::cout << "|\n";
         }
-        
-        for (const auto& line : rowLines) {
-            board += line + "|\n";
-        }
-        board += borderHorizontal + "\n";
     }
-    
-    std::cout << board;
+    std::cout << borderHorizontal << '\n';
 }
 
-void Game::left() {
-    stack();
-    combine();
-    stack();
-    if (checkZeroes()) addNewTile();
+void Game::left() noexcept {
+    stackLeft();
+    combineLeft();
+    stackLeft();
+    if (hasEmptyCell()) addNewTile();
 }
 
-void Game::right() {
+void Game::right() noexcept {
     reverse();
-    stack();
-    combine();
-    stack();
+    stackLeft();
+    combineLeft();
+    stackLeft();
     reverse();
-    if (checkZeroes()) addNewTile();
+    if (hasEmptyCell()) addNewTile();
 }
 
-void Game::up() {
+void Game::up() noexcept {
     transpose();
-    stack();
-    combine();
-    stack();
+    stackLeft();
+    combineLeft();
+    stackLeft();
     transpose();
-    if (checkZeroes()) addNewTile();
+    if (hasEmptyCell()) addNewTile();
 }
 
-void Game::down() {
+void Game::down() noexcept {
     transpose();
     reverse();
-    stack();
-    combine();
-    stack();
+    stackLeft();
+    combineLeft();
+    stackLeft();
     reverse();
     transpose();
-    if (checkZeroes()) addNewTile();
+    if (hasEmptyCell()) addNewTile();
 }
 
-int Game::isGameOver() const {
-    if (std::any_of(_grid.begin(), _grid.end(),
-                    [](const std::vector<int>& row) {
-                        return std::find(row.begin(), row.end(), 2048) != row.end();
-                    })) {
-        return 1; // Win
-    }
-    if (!checkZeroes() && !horizontalMoveExists() && !verticalMoveExists()) {
-        return -1; // Loss
-    }
-    return 0;
-}
-
-
-void Game::stack() {
+void Game::stackLeft() noexcept {
     for (auto& row : _grid) {
-        std::vector<int> newRow(4, 0);
-        int fillPosition = 0;
-        for (const auto& value : row) {
-            if (value != 0) {
-                newRow[fillPosition++] = value;
-            }
-        }
-        row = newRow;
-    }
-}
-
-void Game::combine() {
-    for (auto& row : _grid) {
-        for (size_t j = 0; j < 3; ++j) {
-            if (row[j] != 0 && row[j] == row[j + 1]) {
-                row[j] *= 2;
-                row[j + 1] = 0;
-                _score += row[j];
+        size_t writePos = 0;
+        for (size_t readPos = 0; readPos < GRID_SIZE; ++readPos) {
+            if (row[readPos] != 0) {
+                if (writePos != readPos) {
+                    row[writePos] = row[readPos];
+                    row[readPos] = 0;
+                }
+                ++writePos;
             }
         }
     }
 }
 
-void Game::reverse() {
+void Game::combineLeft() noexcept {
     for (auto& row : _grid) {
-        std::reverse(row.begin(), row.end());
-    }
-}
-
-void Game::transpose() {
-    std::vector<std::vector<int>> newMatrix(4, std::vector<int>(4, 0));
-    for (size_t i = 0; i < 4; ++i) {
-        for (size_t j = 0; j < 4; ++j) {
-            newMatrix[i][j] = _grid[j][i];
+        for (size_t i = 0; i < GRID_SIZE-1; ++i) {
+            if (row[i] != 0 && row[i] == row[i+1]) {
+                row[i] *= 2;
+                row[i+1] = 0;
+                _score += row[i];
+            }
         }
     }
-    _grid = newMatrix;
 }
 
-bool Game::checkZeroes() const {
-    for (const auto& row : _grid) {
-        if (std::find(row.begin(), row.end(), 0) != row.end()) {
-            return true;
+void Game::reverse() noexcept {
+    for (auto& row : _grid) {
+        for (size_t i = 0; i < GRID_SIZE/2; ++i) {
+            std::swap(row[i], row[GRID_SIZE-1-i]);
         }
     }
-    return false;
 }
 
-void Game::addNewTile() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dist(0, 3);
+void Game::transpose() noexcept {
+    for (size_t i = 0; i < GRID_SIZE; ++i) {
+        for (size_t j = i+1; j < GRID_SIZE; ++j) {
+            std::swap(_grid[i][j], _grid[j][i]);
+        }
+    }
+}
+
+void Game::addNewTile() noexcept {
+    static thread_local std::mt19937 gen(std::random_device{}());
+    static thread_local std::uniform_int_distribution<> pos(0, GRID_SIZE-1);
+    static thread_local std::uniform_int_distribution<> val(0, 1);
 
     int row, col;
     do {
-        row = dist(gen);
-        col = dist(gen);
+        row = pos(gen);
+        col = pos(gen);
     } while (_grid[row][col] != 0);
 
-    _grid[row][col] = (dist(gen) % 2 == 0) ? 2 : 4;
+    _grid[row][col] = (val(gen) ? 2 : 4);
 }
 
-bool Game::horizontalMoveExists() const {
+int Game::isGameOver() const noexcept {
     for (const auto& row : _grid) {
-        for (size_t j = 0; j < 3; ++j) {
-            if (row[j] == row[j + 1]) return true;
+        for (auto val : row) {
+            if (val == 2048) return 1;
+        }
+    }
+    
+    if (hasEmptyCell() || canMergeHorizontal() || canMergeVertical()) {
+        return 0;
+    }
+    
+    return -1;
+}
+
+bool Game::hasEmptyCell() const noexcept {
+    for (const auto& row : _grid) {
+        for (auto val : row) {
+            if (val == 0) return true;
         }
     }
     return false;
 }
 
-bool Game::verticalMoveExists() const {
-    for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; j < 4; ++j) {
-            if (_grid[i][j] == _grid[i + 1][j]) return true;
+bool Game::canMergeHorizontal() const noexcept {
+    for (const auto& row : _grid) {
+        for (size_t j = 0; j < GRID_SIZE-1; ++j) {
+            if (row[j] == row[j+1] && row[j] != 0) return true;
+        }
+    }
+    return false;
+}
+
+bool Game::canMergeVertical() const noexcept {
+    for (size_t j = 0; j < GRID_SIZE; ++j) {
+        for (size_t i = 0; i < GRID_SIZE-1; ++i) {
+            if (_grid[i][j] == _grid[i+1][j] && _grid[i][j] != 0) return true;
         }
     }
     return false;

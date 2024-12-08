@@ -10,6 +10,7 @@ set(SOURCE_FILES
     src/main.cpp
     src/game.cpp
     src/mcts.cpp
+    src/gameRunner.cpp
 )
 
 # Create executable
