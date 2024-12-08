@@ -10,12 +10,8 @@
 #include <filesystem>
 
 struct GameData {
-    int trial;
-    std::vector<std::vector<int>> currentState;
-    int currentScore;
     std::string move;
-    std::vector<std::vector<int>> nextState;
-    int nextScore;
+    std::vector<std::vector<int>> currentState;
 };
 
 std::string gridToString(std::vector<std::vector<int>> grid) {
@@ -58,7 +54,6 @@ void runTrialsThread(int startRun, int numTrials) {
         while(true) {
             // Game logic here (unlocked)
             auto currentState = game.getGrid();
-            int currentScore = game.getScore();
             std::string move = player.move(&game);
             
             // Process move (unlocked)
@@ -69,10 +64,8 @@ void runTrialsThread(int startRun, int numTrials) {
                 case 'd': game.down(); break;
             }
 
-            // Collect data (unlocked)
-            auto nextState = game.getGrid();
-            int nextScore = game.getScore();
-            data.push_back({i, currentState, currentScore, move, nextState, nextScore});
+            // Collect data
+            data.push_back({move, currentState});
 
             int gameState = game.isGameOver();
             if(gameState == 1) {
@@ -80,18 +73,21 @@ void runTrialsThread(int startRun, int numTrials) {
                 // Only lock when writing to file
                 {
                     std::lock_guard<std::mutex> lock(file_mutex);
-                    for(const auto& row : data) {
-                        csvfile << row.trial << ","
-                               << gridToString(row.currentState) << ","
-                               << row.currentScore << ","
-                               << row.move << ","
-                               << gridToString(row.nextState) << ","
-                               << row.nextScore << std::endl;
+                    for(const auto& line : data) {
+                        csvfile << line.move;
+                        for(const auto& row : line.currentState) {
+                            for (const auto& cell : row) {
+                                csvfile << "," << cell;
+                            }
+                        }
+                        csvfile << std::endl;
                     }
                 }
+                std::cout << "Win " << res["Wins"] << std::endl;
                 break;
             } else if(gameState == -1) {
                 res["Losses"]++;
+                std::cout << "Loss " << res["Losses"] << std::endl;
                 break;
             }
         }
