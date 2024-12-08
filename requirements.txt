@@ -1,3 +1,5 @@
 tk
 torch
 numpy
+tqdm
+pandas

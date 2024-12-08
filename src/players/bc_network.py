@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader, Dataset
 import numpy as np
 import pandas as pd
 import ast
+import tqdm
 
 # Dataset class
 class ImitationDataset(Dataset):
@@ -28,23 +29,25 @@ class ImitationPolicyNet(nn.Module):
     
     def __init__(self):
         super(ImitationPolicyNet, self).__init__()
-        self.fc1 = nn.Linear(16, 64)
-        self.fc2 = nn.Linear(64, 64)
-        self.fc3 = nn.Linear(64, 4)
-        
+        self.network = nn.Sequential(
+            nn.Linear(16, 256),  # 4x4 board flattened = 16 inputs
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 4),    # 4 possible actions (up, down, left, right)
+            nn.Softmax(dim=-1)
+        )
+    
     def forward(self, x):
-        x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
-        x = torch.softmax(self.fc3(x), dim=-1)
-        return x
+        return self.network(x)
 
 # return states, actions
 
 # Example random data implementation
 def load_train_data():
-    data = pd.read_csv('src/data/train.csv')
+    data = pd.read_csv('train.csv')
 
-    # Processing states
+
     states_data = data['state']
     states_processed = [ast.literal_eval(state) for state in states_data]
     states = []
@@ -53,7 +56,10 @@ def load_train_data():
         state_list = []
         for row in matrix:
             state_list += row
-        states.append(state_list)
+        # Normalize state (log2 of tiles, 0 for empty)
+        new = [x + 1 for x in state_list]
+        final_list = np.log2(new) / 11.0
+        states.append(final_list)
 
     # Processing actions
     actions_data = data['action']
@@ -62,9 +68,9 @@ def load_train_data():
         match a:
             case 'up':
                 actions.append(0)
-            case 'down':
-                actions.append(1)
             case 'left':
+                actions.append(1)
+            case 'down':
                 actions.append(2)
             case 'right':
                 actions.append(3)
@@ -72,10 +78,13 @@ def load_train_data():
     states = np.array(states)
     actions = np.array(actions)
     
+    print(states[0])
+    # print(states[1])
+    # print(states[2])
     return states, actions
 
 # Training function
-def train_model():
+def train_model(device='cuda'):
     
     # Loading train data data and creating dataset
     states, actions = load_train_data()
@@ -83,20 +92,20 @@ def train_model():
     dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
     
     # Neural network
-    model = ImitationPolicyNet()
+    model = ImitationPolicyNet().to(device)
     
     # Initializing log-likelihood optimizer and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     
     # Training loop
-    num_epochs = 20
-    for _ in range(num_epochs):
+    num_epochs = 300
+    for epoch in tqdm.tqdm(range(num_epochs)):
         epoch_loss = 0.0
         for states_batch, actions_batch in dataloader:
             
-            # Zeroing gradients
-            optimizer.zero_grad()
+            states_batch = states_batch.to(device)
+            actions_batch = actions_batch.to(device)
             
             # Forward pass
             outputs = model(states_batch)
@@ -104,20 +113,26 @@ def train_model():
             # Compute loss
             loss = criterion(outputs, actions_batch)
             
+            # Zeroing gradients
+            optimizer.zero_grad()
+
             # Backpropagation
             loss.backward()
             optimizer.step()
             
             epoch_loss += loss.item()
+
+            # if (epoch + 1) % 10 == 0:
+            #     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(dataloader):.4f}")
     
     return model
 
 # Evaluate the model
-def evaluate_model(model, states, actions):
+def evaluate_model(model, states, actions, device='cuda'):
     model.eval()
     with torch.no_grad():
-        states_tensor = torch.tensor(states, dtype=torch.float32)
-        actions_tensor = torch.tensor(actions, dtype=torch.long)
+        states_tensor = torch.tensor(states, dtype=torch.float32).to(device)
+        actions_tensor = torch.tensor(actions, dtype=torch.long).to(device)
         outputs = model(states_tensor)
         predicted_actions = torch.argmax(outputs, dim=1)
         accuracy = (predicted_actions == actions_tensor).float().mean().item()
@@ -125,13 +140,14 @@ def evaluate_model(model, states, actions):
 
 # Main script
 if __name__ == "__main__":
+
     # Train the model
-    trained_model = train_model()
+    trained_model = train_model('cuda')
     
-    torch.save(trained_model.state_dict(), 'src/players/bc_model_weights.pth')
+    torch.save(trained_model.state_dict(), 'bc_model_weights.pth')
 
     # Load validation data
     val_states, val_actions = load_train_data()  # Replace with real validation data
     
     # Evaluate the model
-    evaluate_model(trained_model, val_states, val_actions)
+    evaluate_model(trained_model, val_states, val_actions, 'cuda')
