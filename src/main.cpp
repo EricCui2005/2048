@@ -105,7 +105,10 @@ void runTrialsThread(int startRun, int numTrials) {
 }
 
 int main() {
-    int numTrials, runNumber;
+    int numThreads, numTrials, runNumber;
+
+    std::cout << "Enter number of threads: ";
+    std::cin >> numThreads;
     
     std::cout << "Enter starting run number: ";
     std::cin >> runNumber;
@@ -115,8 +118,8 @@ int main() {
 
     std::vector<std::thread> threads;
     
-    // Create 4 threads
-    for(int i = 0; i < 4; i++) {
+    // Create all threads
+    for(int i = 0; i < numThreads; i++) {
         threads.emplace_back(runTrialsThread, runNumber + i, numTrials);
     }
 
