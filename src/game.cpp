@@ -6,22 +6,8 @@ Game::Game() : _score(0) {
 
 Game::Game(const Grid& weights) : _weights(weights), _score(0) {}
 
-void Game::init() noexcept {
-    _grid.fill({0, 0, 0, 0});
-    _score = 0;
-    _weightDict = weights;
-}
-
-const std::vector<std::vector<int>>& Game::getGrid() const {
-    return _grid;
-}
-
-int Game::getScore() const {
-    return _score;
-}
-
 void Game::init() {
-    _grid = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
+    _grid.fill({0, 0, 0, 0});
     _score = 0;
     addNewTile();
     addNewTile();
