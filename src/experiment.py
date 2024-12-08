@@ -1,15 +1,16 @@
 import csv
+import sys
 from game.game_logic import Game
 from players.mcts_player import MCTSPlayer
 from players.random_player import Random
 from players.random_corner_player import RandomCorner
  
-def trials(player, num_trials):
+def trials(filename, player, num_trials):
     
     game = Game()
     res = {'Wins': 0, 'Losses': 0}
     
-    with open('data/run1.csv', mode='w', newline='') as csvfile:
+    with open('filename', mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
 
         for i in range(num_trials):
@@ -58,9 +59,14 @@ def trials(player, num_trials):
     return res
 
 
-def main():
-    print(trials(player=MCTSPlayer(simulations=100, rollouts=10, c=100, discount=0.9), num_trials=20))
+def main(arg):
+    filepath = 'data/run' + str(arg) + '.csv'
+    print(trials(filepath, player=MCTSPlayer(simulations=100, rollouts=10, c=100, discount=0.9), num_trials=100))
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main(sys.argv[1])
+    else:
+        print("Please provide a run number")
+        sys.exit(1)
