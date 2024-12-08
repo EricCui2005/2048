@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader, Dataset
 import numpy as np
 import pandas as pd
 import ast
+import tqdm
 
 # Dataset class
 class ImitationDataset(Dataset):
@@ -83,7 +84,7 @@ def load_train_data():
     return states, actions
 
 # Training function
-def train_model():
+def train_model(device='cuda'):
     
     # Loading train data data and creating dataset
     states, actions = load_train_data()
@@ -91,20 +92,20 @@ def train_model():
     dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
     
     # Neural network
-    model = ImitationPolicyNet()
+    model = ImitationPolicyNet().to(device)
     
     # Initializing log-likelihood optimizer and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     
     # Training loop
-    num_epochs = 20
-    for _ in range(num_epochs):
+    num_epochs = 1000
+    for epoch in tqdm.tqdm(range(num_epochs)):
         epoch_loss = 0.0
         for states_batch, actions_batch in dataloader:
             
-            # Zeroing gradients
-            optimizer.zero_grad()
+            states_batch = states_batch.to(device)
+            actions_batch = actions_batch.to(device)
             
             # Forward pass
             outputs = model(states_batch)
@@ -112,6 +113,9 @@ def train_model():
             # Compute loss
             loss = criterion(outputs, actions_batch)
             
+            # Zeroing gradients
+            optimizer.zero_grad()
+
             # Backpropagation
             loss.backward()
             optimizer.step()
@@ -121,11 +125,11 @@ def train_model():
     return model
 
 # Evaluate the model
-def evaluate_model(model, states, actions):
+def evaluate_model(model, states, actions, device='cuda'):
     model.eval()
     with torch.no_grad():
-        states_tensor = torch.tensor(states, dtype=torch.float32)
-        actions_tensor = torch.tensor(actions, dtype=torch.long)
+        states_tensor = torch.tensor(states, dtype=torch.float32).to(device)
+        actions_tensor = torch.tensor(actions, dtype=torch.long).to(device)
         outputs = model(states_tensor)
         predicted_actions = torch.argmax(outputs, dim=1)
         accuracy = (predicted_actions == actions_tensor).float().mean().item()
@@ -135,7 +139,7 @@ def evaluate_model(model, states, actions):
 if __name__ == "__main__":
 
     # Train the model
-    trained_model = train_model()
+    trained_model = train_model('cuda')
     
     torch.save(trained_model.state_dict(), 'bc_model_weights.pth')
 
@@ -143,4 +147,4 @@ if __name__ == "__main__":
     val_states, val_actions = load_train_data()  # Replace with real validation data
     
     # Evaluate the model
-    evaluate_model(trained_model, val_states, val_actions)
+    evaluate_model(trained_model, val_states, val_actions, 'cuda')
