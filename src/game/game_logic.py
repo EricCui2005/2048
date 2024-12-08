@@ -28,7 +28,7 @@ class Game():
         self._score = 0
         
         # Reward dict for heuristic MCTS
-        self._weight_dict = HEURISTIC_A
+        self._weight_dict = NORMAL
     
     
     """Accessors"""
