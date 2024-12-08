@@ -6,7 +6,7 @@ Game::Game() : _score(0) {
 
 Game::Game(const Grid& weights) : _weights(weights), _score(0) {}
 
-void Game::init() {
+void Game::init() noexcept {
     _grid.fill({0, 0, 0, 0});
     _score = 0;
     addNewTile();
