@@ -10,7 +10,7 @@ def trials(filename, player, num_trials):
     game = Game()
     res = {'Wins': 0, 'Losses': 0}
     
-    with open('filename', mode='w', newline='') as csvfile:
+    with open(filename, mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
 
         for i in range(num_trials):
