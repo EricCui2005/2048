@@ -122,8 +122,8 @@ def train_model(device='cuda'):
             
             epoch_loss += loss.item()
 
-            if (epoch + 1) % 10 == 0:
-                print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(dataloader):.4f}")
+            # if (epoch + 1) % 10 == 0:
+            #     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(dataloader):.4f}")
     
     return model
 
