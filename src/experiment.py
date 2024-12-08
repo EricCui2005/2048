@@ -16,7 +16,7 @@ def trials(filename, player, num_trials):
             
             game.game_init()
 
-            
+            print(game.score)
             data = []
             
             while True:

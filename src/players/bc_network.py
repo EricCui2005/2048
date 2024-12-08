@@ -28,15 +28,17 @@ class ImitationPolicyNet(nn.Module):
     
     def __init__(self):
         super(ImitationPolicyNet, self).__init__()
-        self.fc1 = nn.Linear(16, 64)
-        self.fc2 = nn.Linear(64, 64)
-        self.fc3 = nn.Linear(64, 4)
-        
+        self.network = nn.Sequential(
+            nn.Linear(16, 256),  # 4x4 board flattened = 16 inputs
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 4),    # 4 possible actions (up, down, left, right)
+            nn.Softmax(dim=-1)
+        )
+    
     def forward(self, x):
-        x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
-        x = torch.softmax(self.fc3(x), dim=-1)
-        return x
+        return self.network(x)
 
 # return states, actions
 
