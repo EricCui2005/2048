@@ -44,9 +44,9 @@ class ImitationPolicyNet(nn.Module):
 
 # Example random data implementation
 def load_train_data():
-    data = pd.read_csv('src/data/train.csv')
+    data = pd.read_csv('train.csv')
 
-    # Processing states
+
     states_data = data['state']
     states_processed = [ast.literal_eval(state) for state in states_data]
     states = []
@@ -55,7 +55,10 @@ def load_train_data():
         state_list = []
         for row in matrix:
             state_list += row
-        states.append(state_list)
+        # Normalize state (log2 of tiles, 0 for empty)
+        new = [x + 1 for x in state_list]
+        final_list = np.log2(new) / 11.0
+        states.append(final_list)
 
     # Processing actions
     actions_data = data['action']
@@ -74,6 +77,9 @@ def load_train_data():
     states = np.array(states)
     actions = np.array(actions)
     
+    print(states[0])
+    # print(states[1])
+    # print(states[2])
     return states, actions
 
 # Training function
@@ -127,10 +133,11 @@ def evaluate_model(model, states, actions):
 
 # Main script
 if __name__ == "__main__":
+
     # Train the model
     trained_model = train_model()
     
-    torch.save(trained_model.state_dict(), 'src/players/bc_model_weights.pth')
+    torch.save(trained_model.state_dict(), 'bc_model_weights.pth')
 
     # Load validation data
     val_states, val_actions = load_train_data()  # Replace with real validation data
