@@ -68,9 +68,9 @@ def load_train_data():
         match a:
             case 'up':
                 actions.append(0)
-            case 'down':
-                actions.append(1)
             case 'left':
+                actions.append(1)
+            case 'down':
                 actions.append(2)
             case 'right':
                 actions.append(3)
