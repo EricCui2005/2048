@@ -99,7 +99,7 @@ def train_model(device='cuda'):
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     
     # Training loop
-    num_epochs = 500
+    num_epochs = 300
     for epoch in tqdm.tqdm(range(num_epochs)):
         epoch_loss = 0.0
         for states_batch, actions_batch in dataloader:
