@@ -1,213 +1,109 @@
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader, Dataset
+import numpy as np
+import pandas as pd
 
-def grad_log_pi(theta, action, state):
-    """
-    Computes the gradient of the log likelihood for a given state-action pair
-    
-    Args:
-        theta: Policy parameters
-        action: Action taken
-        state: State observation
-        
-    Returns:
-        Gradient of log probability of the action given the state
-    """
-    # Compute action probabilities using softmax
-    scores = np.dot(theta, state)
-    probs = np.exp(scores) / np.sum(np.exp(scores))
-    
-    # Compute gradient
-    grad = state * (action - probs)
-    
-    return grad
-
-class BehavioralCloning:
-    def __init__(self, alpha, k_max, grad_log_pi):
-        self.alpha = alpha          # step size
-        self.k_max = k_max         # number of iterations
-        self.grad_log_pi = grad_log_pi  # log likelihood gradient
-
-def optimize(M: BehavioralCloning, D, theta):
-    alpha, k_max, grad_log_pi = M.alpha, M.k_max, M.grad_log_pi
-    
-    for k in range(1, k_max + 1):
-        # Calculate mean gradient over the dataset
-        grad = sum(grad_log_pi(theta, a, s) for s, a in D) / len(D)
-        theta += alpha * grad
-    
-    return theta
-
-
-# import numpy as np
-# import torch
-# import torch.nn as nn
-# import torch.optim as optim
-
-# class PolicyNetwork(nn.Module):
-#     def __init__(self, state_dim, action_dim, hidden_dim=128):
-#         super(PolicyNetwork, self).__init__()
-#         self.network = nn.Sequential(
-#             nn.Linear(state_dim, hidden_dim),
-#             nn.ReLU(),
-#             nn.Linear(hidden_dim, hidden_dim),
-#             nn.ReLU(),
-#             nn.Linear(hidden_dim, action_dim)
-#         )
-    
-#     def forward(self, state):
-#         return self.network(state)
-
-# def grad_log_pi(policy_net, state, action):
-#     """
-#     Computes the gradient of the log likelihood for a given state-action pair
-#     using the policy network
-#     """
-#     scores = policy_net(state)
-#     probs = torch.softmax(scores, dim=-1)
-    
-#     # Convert action to one-hot
-#     action_one_hot = torch.zeros_like(probs)
-#     action_one_hot[action] = 1
-    
-#     # Compute gradient
-#     grad = action_one_hot - probs
-#     return grad
-
-# class DeepBehavioralCloning:
-#     def __init__(self, state_dim, action_dim, learning_rate=0.001, k_max=1000):
-#         self.policy_net = PolicyNetwork(state_dim, action_dim)
-#         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=learning_rate)
-#         self.k_max = k_max
-    
-#     def optimize(self, D):
-#         """
-#         D: list of (state, action) tuples
-#         """
-#         for k in range(1, self.k_max + 1):
-#             self.optimizer.zero_grad()
-            
-#             # Calculate mean gradient over the dataset
-#             total_loss = 0
-#             for state, action in D:
-#                 state = torch.FloatTensor(state)
-#                 scores = self.policy_net(state)
-#                 probs = torch.softmax(scores, dim=-1)
-#                 loss = -torch.log(probs[action])  # Negative log likelihood
-#                 total_loss += loss
-            
-#             # Backpropagate and update
-#             mean_loss = total_loss / len(D)
-#             mean_loss.backward()
-#             self.optimizer.step()
-        
-#         return self.policy_net
-
-
-
-
-
-# Neural Network for 2048
-class Policy2048(nn.Module):
-    def __init__(self):
-        super(Policy2048, self).__init__()
-        self.network = nn.Sequential(
-            nn.Linear(16, 256),  # 4x4 board flattened = 16 inputs
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 4),    # 4 possible actions (up, down, left, right)
-            nn.Softmax(dim=-1)
-        )
-    
-    def forward(self, x):
-        return self.network(x)
-
-# Dataset for storing expert demonstrations
-class GameDataset(Dataset):
+# Dataset class
+class ImitationDataset(Dataset):
     def __init__(self, states, actions):
-        self.states = torch.FloatTensor(states)
-        self.actions = torch.LongTensor(actions)
-    
+        
+        """
+        states: numpy array of shape (num_samples, 16) representing game board states.
+        actions: numpy array of shape (num_samples,) representing the expert actions (0-3).
+        """
+        self.states = torch.tensor(states, dtype=torch.float32)
+        self.actions = torch.tensor(actions, dtype=torch.long)
+        
     def __len__(self):
         return len(self.states)
     
     def __getitem__(self, idx):
         return self.states[idx], self.actions[idx]
 
-# Collect expert demonstrations
-def collect_demonstrations(expert_policy, env, num_episodes=1000):
-    states, actions = [], []
+# Neural network class
+class ImitationPolicyNet(nn.Module):
     
-    for _ in range(num_episodes):
-        state = env.reset()
-        done = False
-        while not done:
-            # Normalize state (log2 of tiles, 0 for empty)
-            norm_state = np.log2(state.flatten() + 1) / 11.0  # max tile is 2048 (2^11)
-            action = expert_policy(state)  # Get expert action
-            states.append(norm_state)
-            actions.append(action)
-            state, _, done, _ = env.step(action)
+    def __init__(self):
+        super(ImitationPolicyNet, self).__init__()
+        self.fc1 = nn.Linear(16, 64)
+        self.fc2 = nn.Linear(64, 64)
+        self.fc3 = nn.Linear(64, 4)
+        
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        x = torch.softmax(self.fc3(x), dim=-1)
+        return x
+
+# Example random data implementation
+def load_data():
     
-    return np.array(states), np.array(actions)
+    data = pd.read_csv('')
+    
+    # """NEED TO UNRANDOMIZE"""
+    # num_samples = 10000  # Example size
+    # states = np.random.rand(num_samples, 16)  # Random states as an example
+    # actions = np.random.randint(0, 4, size=num_samples)  # Random actions (0, 1, 2, 3)
+    # return states, actions
 
 # Training function
-def train_behavioral_cloning(expert_policy, env, device='cuda'):
-    # Initialize policy network
-    policy_net = Policy2048().to(device)
-    optimizer = optim.Adam(policy_net.parameters(), lr=0.001)
-    criterion = nn.CrossEntropyLoss()
+def train_model():
     
-    # Collect expert demonstrations
-    states, actions = collect_demonstrations(expert_policy, env)
-    dataset = GameDataset(states, actions)
+    # Loading train data data and creating dataset
+    states, actions = load_data()
+    dataset = ImitationDataset(states, actions)
     dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
     
+    # Neural network
+    model = ImitationPolicyNet()
+    
+    # Initializing log-likelihood optimizer and optimizer
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    
     # Training loop
-    num_epochs = 100
-    for epoch in range(num_epochs):
-        total_loss = 0
-        for batch_states, batch_actions in dataloader:
-            batch_states = batch_states.to(device)
-            batch_actions = batch_actions.to(device)
+    num_epochs = 20
+    for _ in range(num_epochs):
+        epoch_loss = 0.0
+        for states_batch, actions_batch in dataloader:
+            
+            # Zeroing gradients
+            optimizer.zero_grad()
             
             # Forward pass
-            predictions = policy_net(batch_states)
-            loss = criterion(predictions, batch_actions)
+            outputs = model(states_batch)
             
-            # Backward pass
-            optimizer.zero_grad()
+            # Compute loss
+            loss = criterion(outputs, actions_batch)
+            
+            # Backpropagation
             loss.backward()
             optimizer.step()
             
-            total_loss += loss.item()
-            
-        if (epoch + 1) % 10 == 0:
-            print(f"Epoch {epoch+1}/{num_epochs}, Loss: {total_loss/len(dataloader):.4f}")
+            epoch_loss += loss.item()
     
-    return policy_net
+    return model
 
-# Inference function
-def get_action(policy_net, state, device='cuda'):
+# Evaluate the model
+def evaluate_model(model, states, actions):
+    model.eval()
     with torch.no_grad():
-        norm_state = torch.FloatTensor(np.log2(state.flatten() + 1) / 11.0).to(device)
-        probs = policy_net(norm_state)
-        return torch.argmax(probs).item()
+        states_tensor = torch.tensor(states, dtype=torch.float32)
+        actions_tensor = torch.tensor(actions, dtype=torch.long)
+        outputs = model(states_tensor)
+        predicted_actions = torch.argmax(outputs, dim=1)
+        accuracy = (predicted_actions == actions_tensor).float().mean().item()
+        print(f'Validation Accuracy: {accuracy * 100:.2f}%')
 
-
-# Initialize environment and expert policy
-env = Game2048Env()  # 2048 environment
-expert = ExpertPolicy()  # expert policy
-
-# Train the behavioral cloning policy
-policy_net = train_behavioral_cloning(expert, env)
-
-# Use the trained policy
-state = env.reset()
-while not done:
-    action = get_action(policy_net, state)
-    state, reward, done, _ = env.step(action)
+# Main script
+if __name__ == "__main__":
+    # Train the model
+    trained_model = train_model()
+    
+    # Load validation data
+    val_states, val_actions = load_data()  # Replace with real validation data
+    
+    # Evaluate the model
+    evaluate_model(trained_model, val_states, val_actions)
