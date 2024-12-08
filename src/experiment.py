@@ -9,8 +9,7 @@ def trials(filename, player, num_trials):
     
     game = Game()
     res = {'Wins': 0, 'Losses': 0}
-    
-    with open('filename', mode='w', newline='') as csvfile:
+    with open(filename, mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
 
         for i in range(num_trials):
@@ -61,7 +60,7 @@ def trials(filename, player, num_trials):
 
 def main(arg):
     filepath = 'data/run' + str(arg) + '.csv'
-    print(trials(filepath, player=MCTSPlayer(simulations=100, rollouts=10, c=100, discount=0.9), num_trials=100))
+    print(trials(filepath, player=MCTSPlayer(simulations=100, rollouts=100, c=100, discount=0.9), num_trials=1000))
 
 
 if __name__ == "__main__":
