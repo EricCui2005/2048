@@ -46,6 +46,9 @@ class Game():
         
         # Create matrix of zeroes
         self._matrix = [[0] * 4 for _ in range(4)]
+
+        # reset score
+        self._score = 0
         
         # Fill 2 random cells with 2s
         row = random.randint(0, 3)

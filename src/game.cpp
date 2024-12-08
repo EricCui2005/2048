@@ -31,6 +31,7 @@ int Game::getScore() const {
 
 void Game::init() {
     _grid = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
+    _score = 0;
     addNewTile();
     addNewTile();
 }
