@@ -178,3 +178,26 @@ bool Game::canMergeVertical() const noexcept {
     }
     return false;
 }
+
+bool Game::equals(const Game& other) const noexcept {
+    for (size_t i = 0; i < GRID_SIZE; ++i) {
+        for (size_t j = 0; j < GRID_SIZE; ++j) {
+            if (_grid[i][j] != other._grid[i][j]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+int Game::getEmptyTiles() const noexcept {
+    int count = 0;
+    for (const auto& row : _grid) {
+        for (auto val : row) {
+            if (val == 0) {
+                count++;
+            }
+        }
+    }
+    return count;
+}

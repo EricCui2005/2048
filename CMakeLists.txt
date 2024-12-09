@@ -5,12 +5,16 @@ project(Learning2048 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Find OpenMP package
+find_package(OpenMP REQUIRED)
+
 # Define all source files
 set(SOURCE_FILES
     src/main.cpp
     src/game.cpp
     src/mcts.cpp
     src/gameRunner.cpp
+    src/benchmark.cpp
 )
 
 # Create executable
@@ -21,6 +25,11 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+# Link OpenMP
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
+endif()
 
 # Create data directory
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/data)

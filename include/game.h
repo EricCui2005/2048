@@ -34,6 +34,8 @@ public:
 
     // Game over check
     int isGameOver() const noexcept;
+    bool equals(const Game& other) const noexcept;
+    int getEmptyTiles() const noexcept;
 
 private:
     Grid _grid;
