@@ -65,6 +65,7 @@ def process_actions(actions_data):
 
 def train_model(device):
     # Initialize model with DataParallel if multiple GPUs available
+    
     model = ImitationPolicyNet()
     if torch.cuda.device_count() > 1:
         model = DataParallel(model)
@@ -82,22 +83,39 @@ def train_model(device):
         print(j)
 
         # Read data using Dask
-        ddf = dd.read_csv(file)
+        data = pd.read_csv(file)
         
         
-        # Process data in parallel using Dask
 
-        # Define metadata for the output
-        states_meta = np.array([], dtype=np.float32)
-        actions_meta = np.array([], dtype=np.int64)
+        states_data = data['state']
+        states_processed = [ast.literal_eval(state) for state in states_data]
+        states = []
 
-        # Modified Dask processing with metadata
-        states = ddf['state'].map_partitions(process_states, meta=states_meta)
-        actions = ddf['action'].map_partitions(process_actions, meta=actions_meta)
-        
-        # Compute to materialize the data
-        states = states.compute()
-        actions = actions.compute()
+        for matrix in states_processed:
+            state_list = []
+            for row in matrix:
+                state_list += row
+            # Normalize state (log2 of tiles, 0 for empty)
+            new = [x + 1 for x in state_list]
+            final_list = np.log2(new) / 11.0
+            states.append(final_list)
+
+        # Processing actions
+        actions_data = data['action']
+        actions = []
+        for a in actions_data:
+            match a:
+                case 'up':
+                    actions.append(0)
+                case 'left':
+                    actions.append(1)
+                case 'down':
+                    actions.append(2)
+                case 'right':
+                    actions.append(3)
+
+        states = np.array(states)
+        actions = np.array(actions)
         
         # Create dataset and dataloader
         dataset = ImitationDataset(states, actions)
