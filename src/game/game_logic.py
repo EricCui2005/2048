@@ -224,3 +224,12 @@ class Game():
             return -1 # loss
         else:
             return 0
+
+
+    def game_over512(self):
+        if any(512 in row for row in self.matrix):
+            return 1 # Win
+        elif not self.check_zeroes() and not self.horizontal_move_exists() and not self.vertical_move_exists():
+            return -1 # loss
+        else:
+            return 0
