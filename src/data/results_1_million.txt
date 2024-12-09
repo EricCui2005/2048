@@ -1,5 +1,6 @@
 1 mil training data, 300 epochs, 0.001 learning rate, structure: 16 -> ReLU -> 256 -> ReLu -> 4
 
+1 million, 300 epochs, 10000 trials
 
 
 bc player - win condition: reach 1024 - 10000 trials:

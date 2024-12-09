@@ -10,7 +10,7 @@ class BCPlayer:
     
     def __init__(self):
         self._model = ImitationPolicyNet().to('cpu')  # Recreate the model structure
-        self._model.load_state_dict(torch.load('players/bc_model_weights.pth', map_location=torch.device('cpu')))
+        self._model.load_state_dict(torch.load('players/bc_model_weights_12.pth', map_location=torch.device('cpu')))
     
     def move(self, game, device='cpu'):
         game_list = []
