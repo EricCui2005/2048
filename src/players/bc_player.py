@@ -9,10 +9,10 @@ from game.game_logic import Game
 class BCPlayer:
     
     def __init__(self):
-        self._model = ImitationPolicyNet().to('cpu')  # Recreate the model structure
-        self._model.load_state_dict(torch.load('players/bc_model_weights.pth', map_location=torch.device('cpu')))
+        self._model = ImitationPolicyNet().to('cuda')  # Recreate the model structure
+        self._model.load_state_dict(torch.load('players/bc_model_weights.pth', map_location=torch.device('cuda')))
     
-    def move(self, game, device='cpu'):
+    def move(self, game, device='cuda'):
         game_list = []
         for row in game.matrix:
             game_list += row

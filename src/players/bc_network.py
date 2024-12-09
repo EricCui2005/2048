@@ -46,128 +46,6 @@ class ImitationPolicyNet(nn.Module):
     def forward(self, x):
         return self.network(x)
 
-# return states, actions
-
-# Example random data implementation
-# def load_train_data():
-#     data = pd.read_csv('train.csv')
-
-
-#     states_data = data['state']
-#     states_processed = [ast.literal_eval(state) for state in states_data]
-#     states = []
-
-#     for matrix in states_processed:
-#         state_list = []
-#         for row in matrix:
-#             state_list += row
-#         # Normalize state (log2 of tiles, 0 for empty)
-#         new = [x + 1 for x in state_list]
-#         final_list = np.log2(new) / 11.0
-#         states.append(final_list)
-
-#     # Processing actions
-#     actions_data = data['action']
-#     actions = []
-#     for a in actions_data:
-#         match a:
-#             case 'up':
-#                 actions.append(0)
-#             case 'left':
-#                 actions.append(1)
-#             case 'down':
-#                 actions.append(2)
-#             case 'right':
-#                 actions.append(3)
-
-#     states = np.array(states)
-#     actions = np.array(actions)
-    
-#     print(states[0])
-#     # print(states[1])
-#     # print(states[2])
-#     return states, actions
-
-# Training function
-# def train_model(device='cuda'):
-
-#     chunk_size = 1000  # Adjust based on your memory constraints
-#     data_chunks = pd.read_csv('train.csv', chunksize=chunk_size)
-
-#     # Neural network
-#     model = ImitationPolicyNet().to(device)
-        
-#     # Initializing log-likelihood optimizer and optimizer
-#     criterion = nn.CrossEntropyLoss()
-#     optimizer = optim.Adam(model.parameters(), lr=0.001)
-
-#     for chunk in tqdm.tqdm(data_chunks):
-#         # Process each chunk
-#         states_data = chunk['state']  # Note the space before 'state'
-#         states_processed = [ast.literal_eval(state) for state in states_data]
-#         states = []
-
-#         for matrix in states_processed:
-#             state_list = []
-#             for row in matrix:
-#                 state_list += row
-#             # Normalize state (log2 of tiles, 0 for empty)
-#             new = [x + 1 for x in state_list]
-#             final_list = np.log2(new) / 11.0
-#             states.append(final_list)
-
-#         # Processing actions
-#         actions_data = chunk['action']
-#         actions = []
-#         for a in actions_data:
-#             match a:
-#                 case 'up':
-#                     actions.append(0)
-#                 case 'left':
-#                     actions.append(1)
-#                 case 'down':
-#                     actions.append(2)
-#                 case 'right':
-#                     actions.append(3)
-
-#         states = np.array(states)
-#         actions = np.array(actions)
-
-    
-#         # Loading train data data and creating dataset
-#         dataset = ImitationDataset(states, actions)
-#         dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
-        
-        
-#         # Training loop
-#         num_epochs = 300
-#         for epoch in tqdm.tqdm(range(num_epochs)):
-#             epoch_loss = 0.0
-#             for states_batch, actions_batch in dataloader:
-                
-#                 states_batch = states_batch.to(device)
-#                 actions_batch = actions_batch.to(device)
-                
-#                 # Forward pass
-#                 outputs = model(states_batch)
-                
-#                 # Compute loss
-#                 loss = criterion(outputs, actions_batch)
-                
-#                 # Zeroing gradients
-#                 optimizer.zero_grad()
-
-#                 # Backpropagation
-#                 loss.backward()
-#                 optimizer.step()
-                
-#                 epoch_loss += loss.item()
-
-#                 # if (epoch + 1) % 10 == 0:
-#                 #     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(dataloader):.4f}")
-        
-#     return model
-
 def process_states(states_data):
     states_processed = [ast.literal_eval(state) for state in states_data]
     states = []
@@ -186,6 +64,7 @@ def process_actions(actions_data):
 
 def train_model(device):
     # Initialize model with DataParallel if multiple GPUs available
+    
     model = ImitationPolicyNet()
     if torch.cuda.device_count() > 1:
         model = DataParallel(model)
@@ -203,22 +82,39 @@ def train_model(device):
         print(j)
 
         # Read data using Dask
-        ddf = dd.read_csv(file)
+        data = pd.read_csv(file)
         
         
-        # Process data in parallel using Dask
 
-        # Define metadata for the output
-        states_meta = np.array([], dtype=np.float32)
-        actions_meta = np.array([], dtype=np.int64)
+        states_data = data['state']
+        states_processed = [ast.literal_eval(state) for state in states_data]
+        states = []
 
-        # Modified Dask processing with metadata
-        states = ddf['state'].map_partitions(process_states, meta=states_meta)
-        actions = ddf['action'].map_partitions(process_actions, meta=actions_meta)
-        
-        # Compute to materialize the data
-        states = states.compute()
-        actions = actions.compute()
+        for matrix in states_processed:
+            state_list = []
+            for row in matrix:
+                state_list += row
+            # Normalize state (log2 of tiles, 0 for empty)
+            new = [x + 1 for x in state_list]
+            final_list = np.log2(new) / 11.0
+            states.append(final_list)
+
+        # Processing actions
+        actions_data = data['action']
+        actions = []
+        for a in actions_data:
+            match a:
+                case 'up':
+                    actions.append(0)
+                case 'left':
+                    actions.append(1)
+                case 'down':
+                    actions.append(2)
+                case 'right':
+                    actions.append(3)
+
+        states = np.array(states)
+        actions = np.array(actions)
         
         # Create dataset and dataloader
         dataset = ImitationDataset(states, actions)
