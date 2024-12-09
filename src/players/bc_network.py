@@ -8,6 +8,8 @@ import ast
 import tqdm
 import dask.dataframe as dd
 from torch.nn.parallel import DataParallel
+import glob
+import os
 
 
 # Dataset class
@@ -183,9 +185,6 @@ def process_actions(actions_data):
     return np.array([action_map[a] for a in actions_data])
 
 def train_model(device):
-    # Read data using Dask
-    ddf = dd.read_csv('train.csv')
-    
     # Initialize model with DataParallel if multiple GPUs available
     model = ImitationPolicyNet()
     if torch.cuda.device_count() > 1:
@@ -194,46 +193,58 @@ def train_model(device):
     
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
-    
-    # Process data in parallel using Dask
 
-    # Define metadata for the output
-    states_meta = np.array([], dtype=np.float32)
-    actions_meta = np.array([], dtype=np.int64)
+    # Get list of CSV files
+    csv_files = glob.glob(os.path.join("combiningFolder", "*.csv"))
+    
+    
+    for j, file in enumerate(csv_files):
+        print("run: ")
+        print(j)
 
-    # Modified Dask processing with metadata
-    states = ddf['state'].map_partitions(process_states, meta=states_meta)
-    actions = ddf['action'].map_partitions(process_actions, meta=actions_meta)
-    
-    # Compute to materialize the data
-    states = states.compute()
-    actions = actions.compute()
-    
-    # Create dataset and dataloader
-    dataset = ImitationDataset(states, actions)
-    dataloader = DataLoader(
-        dataset, 
-        batch_size=64, 
-        shuffle=True,
-        num_workers=4,  # Parallel data loading
-        pin_memory=True  # Faster data transfer to GPU
-    )
-    
-    num_epochs = 100
-    for epoch in tqdm.tqdm(range(num_epochs)):
-        epoch_loss = 0.0
-        for states_batch, actions_batch in dataloader:
-            states_batch = states_batch.to(device, non_blocking=True)
-            actions_batch = actions_batch.to(device, non_blocking=True)
-            
-            outputs = model(states_batch)
-            loss = criterion(outputs, actions_batch)
-            
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            
-            epoch_loss += loss.item()
+        # Read data using Dask
+        ddf = dd.read_csv(file)
+        
+        
+        # Process data in parallel using Dask
+
+        # Define metadata for the output
+        states_meta = np.array([], dtype=np.float32)
+        actions_meta = np.array([], dtype=np.int64)
+
+        # Modified Dask processing with metadata
+        states = ddf['state'].map_partitions(process_states, meta=states_meta)
+        actions = ddf['action'].map_partitions(process_actions, meta=actions_meta)
+        
+        # Compute to materialize the data
+        states = states.compute()
+        actions = actions.compute()
+        
+        # Create dataset and dataloader
+        dataset = ImitationDataset(states, actions)
+        dataloader = DataLoader(
+            dataset, 
+            batch_size=64, 
+            shuffle=True,
+            num_workers=4,  # Parallel data loading
+            pin_memory=True  # Faster data transfer to GPU
+        )
+        
+        num_epochs = 100
+        for epoch in tqdm.tqdm(range(num_epochs)):
+            epoch_loss = 0.0
+            for states_batch, actions_batch in dataloader:
+                states_batch = states_batch.to(device, non_blocking=True)
+                actions_batch = actions_batch.to(device, non_blocking=True)
+                
+                outputs = model(states_batch)
+                loss = criterion(outputs, actions_batch)
+                
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                
+                epoch_loss += loss.item()
     
     return model
 

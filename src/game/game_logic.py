@@ -51,13 +51,15 @@ class Game():
         self._score = 0
 
         # Fill 2 random cells with 2s
-        row = random.randint(0, 3)
-        col = random.randint(0, 3)
-        self._matrix[row][col] = 2
-        while(self._matrix[row][col] != 0):
-            row = random.randint(0, 3)
-            col = random.randint(0, 3)
-        self._matrix[row][col] = 2
+        self.add_new_tile()
+        self.add_new_tile()
+        # row = random.randint(0, 3)
+        # col = random.randint(0, 3)
+        # self._matrix[row][col] = 2
+        # while(self._matrix[row][col] != 0):
+        #     row = random.randint(0, 3)
+        #     col = random.randint(0, 3)
+        # self._matrix[row][col] = 2
     
     
     def game_log(self):
@@ -228,6 +230,30 @@ class Game():
 
     def game_over512(self):
         if any(512 in row for row in self.matrix):
+            return 1 # Win
+        elif not self.check_zeroes() and not self.horizontal_move_exists() and not self.vertical_move_exists():
+            return -1 # loss
+        else:
+            return 0
+        
+    def game_over256(self):
+        if any(256 in row for row in self.matrix):
+            return 1 # Win
+        elif not self.check_zeroes() and not self.horizontal_move_exists() and not self.vertical_move_exists():
+            return -1 # loss
+        else:
+            return 0
+        
+    def game_over128(self):
+        if any(128 in row for row in self.matrix):
+            return 1 # Win
+        elif not self.check_zeroes() and not self.horizontal_move_exists() and not self.vertical_move_exists():
+            return -1 # loss
+        else:
+            return 0
+    
+    def game_over1024(self):
+        if any(1024 in row for row in self.matrix):
             return 1 # Win
         elif not self.check_zeroes() and not self.horizontal_move_exists() and not self.vertical_move_exists():
             return -1 # loss
