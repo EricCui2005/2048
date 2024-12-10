@@ -16,25 +16,25 @@ Benchmark::Benchmark(int numTrials, std::string outputPath) noexcept
 }
 
 void Benchmark::generateConfigs() {
-    _configs.reserve(72); // Pre-allocate space
+    _configs.reserve(91); // Pre-allocate space
     
     const int baseSimulations = 50;
     const int baseRollouts = 50;
     const double baseC = 50.0;
-    const double baseDiscount = 0.8;
+    const double baseDiscount = 0.75;
 
-    for (int sim = 50; sim <= 120; sim += 5) {
-        _configs.emplace_back(sim, baseRollouts, baseC, baseDiscount);
-    }
-    for (int roll = 10; roll <= 100; roll += 5) {
+    // for (int sim = 50; sim <= 120; sim += 5) {
+    //     _configs.emplace_back(sim, baseRollouts, baseC, baseDiscount);
+    // }
+    for (int roll = 10; roll <= 100; roll += 1) {
         _configs.emplace_back(baseSimulations, roll, baseC, baseDiscount);
     }
-    for (int c = 5; c <= 100; c += 5) {
-        _configs.emplace_back(baseSimulations, baseRollouts, static_cast<double>(c), baseDiscount);
-    }
-    for (double disc = 0.1; disc <= 0.99; disc += 0.05) {
-        _configs.emplace_back(baseSimulations, baseRollouts, baseC, disc);
-    }
+    // for (int c = 5; c <= 100; c += 5) {
+    //     _configs.emplace_back(baseSimulations, baseRollouts, static_cast<double>(c), baseDiscount);
+    // }
+    // for (double disc = 0.1; disc <= 0.99; disc += 0.05) {
+    //     _configs.emplace_back(baseSimulations, baseRollouts, baseC, disc);
+    // }
 }
 
 void Benchmark::writeConfigToFile(const BenchmarkConfig& config) {
