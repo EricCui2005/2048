@@ -1,0 +1,44 @@
+12 epochs full dataset
+
+
+
+bc player - win condition: reach 1024 - 1000 trials:
+{'Wins': 1, 'Losses': 999, 'Win Ratio': 0.001}
+
+
+
+random player - win condition: reach 1024 - 1000 trials:
+{'Wins': 0, 'Losses': 1000, 'Win Ratio': 0.0}
+
+
+
+bc player - win condition: reach 512 - 1000 trials:
+{'Wins': 95, 'Losses': 905, 'Win Ratio': 0.095}
+
+
+
+random player - win condition: reach 512 - 1000 trials:
+{'Wins': 0, 'Losses': 1000, 'Win Ratio': 0.0}
+
+
+
+bc player - win condition: reach 256 - 1000 trials:
+{'Wins': 526, 'Losses': 474, 'Win Ratio': 0.526}
+
+
+
+random player - win condition: reach 256 - 1000 trials:
+{'Wins': 16, 'Losses': 984, 'Win Ratio': 0.016}
+
+
+
+bc player - win condition: reach 128 - 1000 trials:
+{'Wins': 908, 'Losses': 92, 'Win Ratio': 0.908}
+
+
+
+random player - win condition: reach 128 - 1000 trials:
+{'Wins': 374, 'Losses': 626, 'Win Ratio': 0.374}
+
+
+

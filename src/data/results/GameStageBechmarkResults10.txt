@@ -1,0 +1,54 @@
+55 million, 15 epochs, 10000 trials
+
+
+
+bc player - win condition: reach 2048 - 10000 trials:
+{'Wins': 0, 'Losses': 10000, 'Win Ratio': 0.0}
+
+
+
+random player - win condition: reach 2048 - 10000 trials:
+{'Wins': 0, 'Losses': 10000, 'Win Ratio': 0.0}
+
+
+
+bc player - win condition: reach 1024 - 10000 trials:
+{'Wins': 3, 'Losses': 9997, 'Win Ratio': 0.0003}
+
+
+
+random player - win condition: reach 1024 - 10000 trials:
+{'Wins': 0, 'Losses': 10000, 'Win Ratio': 0.0}
+
+
+
+bc player - win condition: reach 512 - 10000 trials:
+{'Wins': 687, 'Losses': 9313, 'Win Ratio': 0.0687}
+
+
+
+random player - win condition: reach 512 - 10000 trials:
+{'Wins': 0, 'Losses': 10000, 'Win Ratio': 0.0}
+
+
+
+bc player - win condition: reach 256 - 10000 trials:
+{'Wins': 5099, 'Losses': 4901, 'Win Ratio': 0.5099}
+
+
+
+random player - win condition: reach 256 - 10000 trials:
+{'Wins': 259, 'Losses': 9741, 'Win Ratio': 0.0259}
+
+
+
+bc player - win condition: reach 128 - 10000 trials:
+{'Wins': 8958, 'Losses': 1042, 'Win Ratio': 0.8958}
+
+
+
+random player - win condition: reach 128 - 10000 trials:
+{'Wins': 3518, 'Losses': 6482, 'Win Ratio': 0.3518}
+
+
+

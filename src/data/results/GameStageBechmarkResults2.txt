@@ -1,0 +1,44 @@
+7mil training data, 12 epochs, 0.01 learning rate, structure: 16 -> ReLU -> 256 -> ReLu -> 4
+
+
+
+bc player - win condition: reach 1024 - 1000 trials:
+{'Wins': 0, 'Losses': 1000, 'Win Ratio': 0.0}
+
+
+
+random player - win condition: reach 1024 - 1000 trials:
+{'Wins': 0, 'Losses': 1000, 'Win Ratio': 0.0}
+
+
+
+bc player - win condition: reach 512 - 1000 trials:
+{'Wins': 0, 'Losses': 1000, 'Win Ratio': 0.0}
+
+
+
+random player - win condition: reach 512 - 1000 trials:
+{'Wins': 0, 'Losses': 1000, 'Win Ratio': 0.0}
+
+
+
+bc player - win condition: reach 256 - 1000 trials:
+{'Wins': 62, 'Losses': 938, 'Win Ratio': 0.062}
+
+
+
+random player - win condition: reach 256 - 1000 trials:
+{'Wins': 22, 'Losses': 978, 'Win Ratio': 0.022}
+
+
+
+bc player - win condition: reach 128 - 1000 trials:
+{'Wins': 324, 'Losses': 676, 'Win Ratio': 0.324}
+
+
+
+random player - win condition: reach 128 - 1000 trials:
+{'Wins': 391, 'Losses': 609, 'Win Ratio': 0.391}
+
+
+
