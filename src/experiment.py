@@ -9,6 +9,7 @@ def trials(filename, player, num_trials):
     
     game = Game()
     res = {'Wins': 0, 'Losses': 0}
+    
     with open(filename, mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
 
@@ -21,7 +22,6 @@ def trials(filename, player, num_trials):
             
             while True:
                 current_state = game.matrix
-                current_score = game.score
 
                 move = player.move(game)
                 
@@ -36,12 +36,7 @@ def trials(filename, player, num_trials):
                     case 'right':
                         game.right()
 
-                next_state = game.matrix
-                next_score = game.score
-
-                reward = next_score - current_score
-
-                data.append((i, current_state, current_score, move, reward, next_state, next_score))
+                data.append((move, current_state))
                     
                 if game.game_over() == 1:
                     print(f"Trial {i + 1}: Win")
