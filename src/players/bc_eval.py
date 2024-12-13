@@ -78,7 +78,7 @@ def evaluate_model(model, states, actions, device='cuda'):
 if __name__ == "__main__":
 
     model = ImitationPolicyNet().to('cuda')  # Recreate the model structure
-    model.load_state_dict(torch.load('bc_model_weights.pth', map_location=torch.device('cuda')))
+    model.load_state_dict(torch.load('weights/bc_model_weights.pth', map_location=torch.device('cuda')))
 
     # Load validation data
     val_states, val_actions = load_train_data()  # Replace with real validation data
