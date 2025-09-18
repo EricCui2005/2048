@@ -1,4 +1,7 @@
 # 2048
+
+### [Report](https://drive.google.com/file/d/14kUtHB5jCnJ2wjJKYhxEYl1OsMnCBGFx/view?usp=sharing)
+
 2048 machine learning project for Stanford CS238: Decision Making Under Uncertainty
 
 ## Development
